@@ -6,6 +6,7 @@ spec:
   selector:
     app: argocd-demo-app
   ports:
-  - port: 3000
-    protocol: TCP
-    targetPort: 3000
+    - type: NodePort
+      port: 8080
+      targetPort: 3000
+      nodePort: 30080
