@@ -1,0 +1,31 @@
+name: Update Kubernetes Manifest
+
+on:
+  repository_dispatch:
+    types:
+      - update-manifest
+
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Update Kubernetes manifest file
+      run: |
+        new_version="${{ github.event.client_payload.new_version }}"
+        yq eval -i '.spec.template.spec.containers[0].image = "hangoutdude/argocd-demo-app:'${new_version}'"' ./deployment.yaml
+
+    - name: Commit changes
+      run: |
+        git config user.email "jinagamvasubabu@gmail.com"
+        git config user.name "GitHub Actions"
+        git add ./deployment.yaml
+        git commit -m "Update Docker image version to ${new_version}"
+
+    - name: Push changes
+      uses: ad-m/github-push-action@v0.7
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
